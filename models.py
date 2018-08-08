@@ -17,3 +17,10 @@ class User(db.Document):
 
     def get_id(self):
         return str(self.id)
+
+
+class TodoItem(db.Document):
+    user_id = db.ObjectIdField()
+    title = db.StringField(max_length=120, required=True)
+    description = db.StringField()
+    completed = db.BooleanField()
