@@ -3,7 +3,6 @@ from flask_login import current_user, login_required, login_user, logout_user
 
 from extensions import login_manager
 from models import DatabaseError, User, TodoItem, validate_id
-from util import jsonify_item
 
 
 blueprint = Blueprint('routes', __name__)
@@ -53,7 +52,7 @@ def create_todo_item():
         except DatabaseError as e:
             abort(500, str(e))
 
-        return jsonify(jsonify_item(item)), 201
+        return jsonify(item.jsonify()), 201
 
 @blueprint.route('/todo/todo_items/<string:item_id>', methods=['PUT'])
 @login_required
@@ -81,7 +80,7 @@ def update_todo_item(item_id):
         except DatabaseError as e:
             abort(500, str(e))
         else:
-            return jsonify(jsonify_item(item)), 200
+            return jsonify(item.jsonify()), 200
 
 @blueprint.route('/todo/todo_items/<string:user_id>', methods=['GET'])
 @login_required
@@ -94,7 +93,7 @@ def get_user_todo_items(user_id):
     except DatabaseError as e:
         abort(500, str(e))
 
-    return jsonify([jsonify_item(item) for item in items]), 200
+    return jsonify([item.jsonify() for item in items]), 200
 
 @blueprint.route('/todo/todo_items/<string:item_id>', methods=['DELETE'])
 @login_required

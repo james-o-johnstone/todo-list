@@ -79,6 +79,17 @@ class TodoItem(db.Document):
         except Exception:
             raise DatabaseError
 
+    def jsonify(self):
+        return {
+            'item': {
+                'completed': self.completed,
+                'description': self.description,
+                'id': str(self.id),
+                'title': self.title,
+                'user_id': str(self.user_id),
+            }
+        }
+
 
 def validate_id(_id):
     return ObjectId.is_valid(_id)
