@@ -1,6 +1,11 @@
+import logging
+
 from flask_pymongo import ObjectId
 
 from todo_api.extensions import db
+
+
+logger = logging.getLogger(__name__)
 
 
 class User(db.Document):
@@ -24,7 +29,8 @@ class User(db.Document):
     def find_user(cls, login):
         try:
             user = cls.objects(login=login).first()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
         else:
             return user
@@ -40,7 +46,8 @@ class TodoItem(db.Document):
     def find_user_items(cls, user_id):
         try:
             items = cls.objects(user_id=user_id)
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
         else:
             return items
@@ -49,7 +56,8 @@ class TodoItem(db.Document):
     def find_item(cls, item_id):
         try:
             item = cls.objects(id=item_id).first()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
         else:
             return item
@@ -58,7 +66,8 @@ class TodoItem(db.Document):
     def create(cls, **kwargs):
         try:
             item = cls(**kwargs).save()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
         else:
             return item
@@ -69,14 +78,16 @@ class TodoItem(db.Document):
 
         try:
             self.save()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
 
     @classmethod
     def delete_item(cls, item_id):
         try:
             cls.objects(id=item_id).delete()
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             raise DatabaseError
 
     def jsonify(self):

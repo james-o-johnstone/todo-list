@@ -19,18 +19,18 @@ def do_login():
         login = login_info['login']
         password = login_info['password']
     except KeyError:
-        abort(400, 'JSON missing "login" or "password" key')
+        abort(400, "JSON missing 'login' or 'password' key")
 
     try:
         user = User.find_user(login)
     except DatabaseError as e:
-        abort(500, str(e))
+        abort(500, e)
 
     if user is not None and password == user.password:
         login_user(user)
         return '', 204
     else:
-        abort(401, 'Incorrect username or password')
+        abort(401, "Incorrect username or password")
 
 @blueprint.route('/todo/todo_items', methods=['POST'])
 @login_required
@@ -40,7 +40,7 @@ def create_todo_item():
 
     todo = request.get_json()
     if 'title' not in todo:
-        abort(400, 'JSON missing required "title" key')
+        abort(400, "JSON missing required 'title' key")
     else:
         try:
             item = TodoItem.create(
@@ -50,7 +50,7 @@ def create_todo_item():
                 completed=False,
             )
         except DatabaseError as e:
-            abort(500, str(e))
+            abort(500, e)
 
         return jsonify(item.jsonify()), 201
 
@@ -58,27 +58,27 @@ def create_todo_item():
 @login_required
 def update_todo_item(item_id):
     if not request.json:
-        abort(400, 'No JSON in request')
+        abort(400, "No JSON in request")
 
     if not validate_id(item_id):
-        abort(400, 'Todo item id: %s is not a valid id' % item_id)
+        abort(400, "Todo item id: %s is not a valid id" % item_id)
 
     try:
         item = TodoItem.find_item(item_id)
     except DatabaseError as e:
-        abort(500, str(e))
+        abort(500, e)
 
     if item is None:
-        abort(404, 'Todo item with id: %s not found' % item_id)
+        abort(404, "Todo item with id: %s not found" % item_id)
 
     updated_todo = request.get_json()
     if 'completed' not in updated_todo:
-        abort(400, 'JSON missing required "completed" key')
+        abort(400, "JSON missing required 'completed' key")
     else:
         try:
             item.update(completed=updated_todo['completed'])
         except DatabaseError as e:
-            abort(500, str(e))
+            abort(500, e)
         else:
             return jsonify(item.jsonify()), 200
 
@@ -86,12 +86,12 @@ def update_todo_item(item_id):
 @login_required
 def get_user_todo_items(user_id):
     if not validate_id(user_id):
-        abort(400, 'Todo user id: %s is not a valid id' % user_id)
+        abort(400, "Todo user id: %s is not a valid id" % user_id)
 
     try:
         items = TodoItem.find_user_items(user_id)
     except DatabaseError as e:
-        abort(500, str(e))
+        abort(500, e)
 
     return jsonify([item.jsonify() for item in items]), 200
 
@@ -99,12 +99,12 @@ def get_user_todo_items(user_id):
 @login_required
 def delete_todo_item(item_id):
     if not validate_id(item_id):
-        abort(400, 'Todo item id: %s is not a valid id' % item_id)
+        abort(400, "Todo item id: %s is not a valid id" % item_id)
 
     try:
         TodoItem.delete_item(item_id)
     except DatabaseError as e:
-        abort(500, str(e))
+        abort(500, e)
     else:
         return '', 204
 
