@@ -1,9 +1,8 @@
 from flask import abort, Blueprint, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
 
-from extensions import login_manager
-from models import DatabaseError, User, TodoItem, validate_id
-
+from todo_api.extensions import login_manager
+from todo_api.models import DatabaseError, User, TodoItem, validate_id
 
 blueprint = Blueprint('routes', __name__)
 

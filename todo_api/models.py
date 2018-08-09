@@ -1,6 +1,6 @@
 from flask_pymongo import ObjectId
 
-from extensions import db
+from todo_api.extensions import db
 
 
 class User(db.Document):

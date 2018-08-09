@@ -1,7 +1,8 @@
 from flask import Flask
 
-from extensions import db, login_manager
-import routes
+from todo_api import routes
+from todo_api.extensions import db, login_manager
+
 
 def create_app(config_object):
     app = Flask(__name__)
