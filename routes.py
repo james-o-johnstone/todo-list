@@ -1,11 +1,8 @@
-import json
-
 from flask import abort, Blueprint, jsonify, request
 from flask_login import current_user, login_required, login_user, logout_user
-from flask_pymongo import ObjectId
 
 from extensions import login_manager
-from models import User, TodoItem
+from models import DatabaseError, User, TodoItem, validate_id
 from util import jsonify_item
 
 
@@ -17,7 +14,7 @@ def load_user(user_id):
     return User.objects(id=user_id).first()
 
 @blueprint.route('/login', methods=['POST'])
-def login():
+def do_login():
     login_info = request.get_json()
     try:
         login = login_info['login']
@@ -26,17 +23,17 @@ def login():
         abort(400, 'JSON missing "login" or "password" key')
 
     try:
-        user = User.objects(login=login_info['login']).first()
-    except Exception:
-        abort(500, 'Database error')
+        user = User.find_user(login)
+    except DatabaseError as e:
+        abort(500, str(e))
 
-    if user is not None and login_info['password'] == user.password:
+    if user is not None and password == user.password:
         login_user(user)
         return '', 204
     else:
         abort(401, 'Incorrect username or password')
 
-@blueprint.route('/todo_items', methods=['POST'])
+@blueprint.route('/todo/todo_items', methods=['POST'])
 @login_required
 def create_todo_item():
     if not request.json:
@@ -47,30 +44,30 @@ def create_todo_item():
         abort(400, 'JSON missing required "title" key')
     else:
         try:
-            item = TodoItem(
+            item = TodoItem.create(
                 user_id=current_user.id,
                 title=todo['title'],
                 description=todo.get('description', ''),
                 completed=False,
-            ).save()
-        except Exception:
-            abort(500, 'Database error')
+            )
+        except DatabaseError as e:
+            abort(500, str(e))
 
         return jsonify(jsonify_item(item)), 201
 
-@blueprint.route('/todo_items/<string:item_id>', methods=['PUT'])
+@blueprint.route('/todo/todo_items/<string:item_id>', methods=['PUT'])
 @login_required
 def update_todo_item(item_id):
     if not request.json:
         abort(400, 'No JSON in request')
 
-    if not ObjectId.is_valid(item_id):
+    if not validate_id(item_id):
         abort(400, 'Todo item id: %s is not a valid id' % item_id)
 
     try:
-        item = TodoItem.objects(id=item_id).first()
-    except Exception:
-        abort(500, 'Database error')
+        item = TodoItem.find_item(item_id)
+    except DatabaseError as e:
+        abort(500, str(e))
 
     if item is None:
         abort(404, 'Todo item with id: %s not found' % item_id)
@@ -79,27 +76,41 @@ def update_todo_item(item_id):
     if 'completed' not in updated_todo:
         abort(400, 'JSON missing required "completed" key')
     else:
-        item.completed = updated_todo['completed']
-        item.save()
-        return jsonify(jsonify_item(item)), 200
+        try:
+            item.update(completed=updated_todo['completed'])
+        except DatabaseError as e:
+            abort(500, str(e))
+        else:
+            return jsonify(jsonify_item(item)), 200
 
-@blueprint.route('/todo_items/<string:user_id>', methods=['GET'])
+@blueprint.route('/todo/todo_items/<string:user_id>', methods=['GET'])
 @login_required
 def get_user_todo_items(user_id):
-    if not ObjectId.is_valid(user_id):
+    if not validate_id(user_id):
         abort(400, 'Todo user id: %s is not a valid id' % user_id)
 
     try:
-        items = TodoItem.objects(user_id=user_id)
-    except Exception:
-        abort(500, 'Database error')
+        items = TodoItem.find_user_items(user_id)
+    except DatabaseError as e:
+        abort(500, str(e))
 
     return jsonify([jsonify_item(item) for item in items]), 200
 
+@blueprint.route('/todo/todo_items/<string:item_id>', methods=['DELETE'])
+@login_required
+def delete_todo_item(item_id):
+    if not validate_id(item_id):
+        abort(400, 'Todo item id: %s is not a valid id' % item_id)
+
+    try:
+        TodoItem.delete_item(item_id)
+    except DatabaseError as e:
+        abort(500, str(e))
+    else:
+        return '', 204
+
 @blueprint.route('/logout')
 @login_required
-def logout_view():
+def logout():
     logout_user()
-
-
-
+    return '', 200

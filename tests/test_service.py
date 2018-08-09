@@ -100,7 +100,7 @@ class TestLogin(BaseTestService):
 class TestCreateTodo(BaseTestService):
     def test_create(self):
         response = self.test_client.post(
-            '/todo_items',
+            '/todo/todo_items',
             data=json.dumps(
                 {'title': 'title', 'description': 'description'}
             ),
@@ -129,7 +129,7 @@ class TestCreateTodo(BaseTestService):
 
     def test_create_no_description(self):
         response = self.test_client.post(
-            '/todo_items',
+            '/todo/todo_items',
             data=json.dumps(
                 {'title': 'title'}
             ),
@@ -141,7 +141,7 @@ class TestCreateTodo(BaseTestService):
 
     def test_create_invalid_json(self):
         response = self.test_client.post(
-            '/todo_items',
+            '/todo/todo_items',
             data=json.dumps(
                 {'description': 'description'}
             ),
@@ -151,7 +151,7 @@ class TestCreateTodo(BaseTestService):
 
     def test_create_no_json(self):
         response = self.test_client.post(
-            '/todo_items',
+            '/todo/todo_items',
         )
         self.assertEqual(response.status_code, 400)
 
@@ -166,7 +166,7 @@ class TestUpdateTodo(BaseTestService):
         ).save()
 
         response = self.test_client.put(
-            '/todo_items/%s' % str(item.id),
+            '/todo/todo_items/%s' % str(item.id),
             data=json.dumps({'completed': True}),
             content_type='application/json',
         )
@@ -178,13 +178,13 @@ class TestUpdateTodo(BaseTestService):
 
     def test_no_json(self):
         response = self.test_client.put(
-            '/todo_items/item_id',
+            '/todo/todo_items/item_id',
         )
         self.assertEqual(response.status_code, 400)
 
     def test_invalid_item_id(self):
         response = self.test_client.put(
-            '/todo_items/123456',
+            '/todo/todo_items/123456',
             data=json.dumps({'completed': True}),
             content_type='application/json',
         )
@@ -192,7 +192,7 @@ class TestUpdateTodo(BaseTestService):
 
     def test_no_items(self):
         response = self.test_client.put(
-            '/todo_items/5b6b37245f9f3dbfda30cc7f',
+            '/todo/todo_items/5b6b37245f9f3dbfda30cc7f',
             data=json.dumps({'completed': True}),
             content_type='application/json',
         )
@@ -222,7 +222,7 @@ class TestGetItems(BaseTestService):
                 }
             })
 
-        response = self.test_client.get('/todo_items/%s' % user_id)
+        response = self.test_client.get('/todo/todo_items/%s' % user_id)
         self.assertEqual(response.status_code, 200)
 
         response_items = response.get_json()
@@ -230,12 +230,33 @@ class TestGetItems(BaseTestService):
             self.assertDictEqual(item, expected)
 
     def test_no_items(self):
-        response = self.test_client.get('/todo_items/5b6b37245f9f3dbfda30cc7f')
+        response = self.test_client.get('/todo/todo_items/5b6b37245f9f3dbfda30cc7f')
         self.assertEqual(response.status_code, 200)
 
         items = response.get_json()
         self.assertEqual([], items)
 
     def test_invalid_user_id(self):
-        response = self.test_client.get('/todo_items/123456')
+        response = self.test_client.get('/todo/todo_items/123456')
         self.assertEqual(response.status_code, 400)
+
+
+class TestDeleteItem(BaseTestService):
+    def test_delete(self):
+        item = TodoItem(
+            user_id='5b6b37245f9f3dbfda30cc7f',
+            title='title',
+            description='description',
+            completed=False,
+        ).save()
+
+        response = self.test_client.delete('/todo/todo_items/%s' % str(item.id))
+        self.assertEqual(response.status_code, 204)
+
+    def test_invalid_item_id(self):
+        response = self.test_client.delete('/todo/todo_items/abcdef')
+        self.assertEqual(response.status_code, 400)
+
+    def test_delete_missing_item(self):
+        response = self.test_client.delete('/todo/todo_items/5b6b37245f9f3dbfda30cc7f')
+        self.assertEqual(response.status_code, 204)
