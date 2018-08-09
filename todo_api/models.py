@@ -1,6 +1,6 @@
 import logging
 
-from flask_pymongo import ObjectId
+from bson import ObjectId
 
 from todo_api.extensions import db
 
