@@ -1,3 +1,4 @@
+bson
 flask
 flask_login
 flask_mongoengine
