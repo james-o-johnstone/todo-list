@@ -7,6 +7,7 @@ from todo_api.app import create_app
 from todo_api.extensions import db, login_manager
 from todo_api.models import User, TodoItem
 
+
 TEST_DB_NAME = 'test'
 
 

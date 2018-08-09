@@ -4,6 +4,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from todo_api.extensions import login_manager
 from todo_api.models import DatabaseError, User, TodoItem, validate_id
 
+
 blueprint = Blueprint('routes', __name__)
 
 
