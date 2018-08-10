@@ -108,7 +108,7 @@ def delete_todo_item(item_id):
     else:
         return '', 204
 
-@blueprint.route('/logout')
+@blueprint.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()

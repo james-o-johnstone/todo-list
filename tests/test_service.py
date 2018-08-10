@@ -249,9 +249,13 @@ class TestDeleteItem(BaseTestService):
             description='description',
             completed=False,
         ).save()
+        item_id = item.id
 
         response = self.test_client.delete('/todo/todo_items/%s' % str(item.id))
+        item = TodoItem.find_item(item_id)
+
         self.assertEqual(response.status_code, 204)
+        self.assertIsNone(item)
 
     def test_invalid_item_id(self):
         response = self.test_client.delete('/todo/todo_items/abcdef')
@@ -259,4 +263,22 @@ class TestDeleteItem(BaseTestService):
 
     def test_delete_missing_item(self):
         response = self.test_client.delete('/todo/todo_items/5b6b37245f9f3dbfda30cc7f')
+        self.assertEqual(response.status_code, 204)
+
+
+class TestLogout(BaseTestService):
+    def test_logout(self):
+        login = 'login'
+        password = 'password'
+        User(login=login, password=password).save()
+
+        self.test_client.post(
+            '/login',
+            data=json.dumps(
+                {'login': login, 'password': password}
+            ),
+            content_type='application/json',
+        )
+
+        response = self.test_client.get('/logout')
         self.assertEqual(response.status_code, 204)
