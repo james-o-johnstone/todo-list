@@ -8,13 +8,13 @@ Documents are persisted in [MongoDB](https://www.mongodb.com/).
 
 ## Installation
 1. [Install MongoDB](https://docs.mongodb.com/manual/installation/)
-2. cd to the project folder and create a virtual env, e.g.: `python3 -m virtualenv env`
+2. cd to the project folder, create and activate a virtual env, e.g.: `python3 -m virtualenv env && source env/bin/activate`
 3. `pip install -r requirements.txt && pip install .`
 
 ## Tests
 To run the tests, a local instance of MongoDB must be running (e.g.: [running MongoDB on Linux](https://docs.mongodb.com/manual/tutorial/install-mongodb-enterprise-on-ubuntu/#run-mongodb-enterprise))
 
-cd to the project folder and: `python -m unittest discover -s tests`
+Ensure that you are in the virtualenv, cd to the project folder and: `python -m unittest discover -s tests`
 
 ## Documentation
 To run the Flask app cd to the project folder and `python todo_api/main.py`
