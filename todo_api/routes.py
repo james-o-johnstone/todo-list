@@ -112,4 +112,4 @@ def delete_todo_item(item_id):
 @login_required
 def logout():
     logout_user()
-    return '', 200
+    return '', 204
