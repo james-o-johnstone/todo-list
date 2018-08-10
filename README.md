@@ -4,7 +4,7 @@
 ## About 
 REST API written in Python/Flask to manage a simple todo list.
 
-Documents are persisted in MongoDB.
+Documents are persisted in [MongoDB](https://www.mongodb.com/).
 
 ## Installation
 1. [Install MongoDB](https://docs.mongodb.com/manual/installation/)
@@ -17,10 +17,12 @@ To run the tests, a local instance of MongoDB must be running (e.g.: [running Mo
 cd to the project folder and: `python -m unittest discover -s tests`
 
 ## Documentation
-To run the Flask app cd to the project fodler and `python todo_api/main.py`
+To run the Flask app cd to the project folder and `python todo_api/main.py`
 
 ### Authentication
-The app has been hardcoded with a single user (login = test_login, password = password123), after login the session value in the response cookie can be used to authenticate further api requests.
+The app has been hardcoded with a single user (login = test_login, password = password123). 
+
+After login the session value in the response cookie can be used to authenticate further api requests.
 
 #### Example 
 To obtain a session cookie for this user.
@@ -42,7 +44,6 @@ Status: 200 OK
 Headers:
   Set-Cookie: session=.eJwlzrsNwzAMANFdVLsgRUqivEzAj4ikteMqyO4xkAEO7z7lkcc6n2V_H9fayuMVZS9TQ8h8uGjNGHWFuTqoKy0ZYZgAXWt1Vkaj5gGMXu8GeSZoBkjnLgNxdWuSvUsDJmhzVQ5CAUcEdkJ0t5vJfnuYU_FWrWzlOtfxn2nWrTanljMpzOrEucShfH-IRjYj.Dk5TQA.rDiobiHxUpvjFf7F8txh4-1Vvm4;
 ```
-Header contains cookie with a session value which can be used to authenticate further api requests.
 
 ### Create a new todo item
 A todo item requires a title, the description field is optional.
@@ -77,6 +78,7 @@ Returns a new todo item.
 
 ### List a user's set of todo items
 `GET http://localhost:5000/todo/todo_item/:user_id`
+
 Returns a list of todo items.
 
 #### Example
@@ -110,7 +112,9 @@ Returns a list of todo items.
 
 ### Mark any single todo item as completed
 `PUT http://localhost:5000/todo/todo_item/:item_id`
+
 The same request can also be used to mark the todo item as not complete (by using `"completed": false` in the request body).
+
 Returns the updated todo item.
 
 #### Example
@@ -160,7 +164,7 @@ Status: 204 NO CONTENT
 
 ##### Response
 ```
-Status: 200 OK
+Status: 204 NO CONTENT
 ```
 
 
