@@ -78,6 +78,7 @@ Returns a new todo item.
 
 ### List a user's set of todo items
 `GET http://localhost:5000/todo/todo_item/:user_id`
+
 Returns a list of todo items.
 
 #### Example
